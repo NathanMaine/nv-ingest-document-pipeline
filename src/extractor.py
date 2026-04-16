@@ -21,6 +21,7 @@ import json
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,7 @@ class ExtractedContent:
     text: str
     page_number: int
     source_file: str
-    metadata: dict = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -101,15 +102,15 @@ class DocumentExtractor:
             ValueError: If any input file is not a PDF.
             ImportError: If nv-ingest is not installed.
         """
-        pdf_paths = [Path(p) for p in pdf_paths]
-        for p in pdf_paths:
+        resolved_paths: list[Path] = [Path(p) for p in pdf_paths]
+        for p in resolved_paths:
             if not p.exists():
                 raise FileNotFoundError(f"PDF not found: {p}")
             if p.suffix.lower() != ".pdf":
                 raise ValueError(f"Expected PDF file, got: {p.suffix}")
 
         try:
-            return self._extract_with_nv_ingest(pdf_paths)
+            return self._extract_with_nv_ingest(resolved_paths)
         except ImportError as exc:
             logger.warning(
                 "nv-ingest not available. Install with: pip install nv-ingest nv-ingest-client"
@@ -152,7 +153,7 @@ class DocumentExtractor:
 
     def _parse_nv_ingest_output(
         self,
-        raw: dict,
+        raw: dict[str, Any],
         source_file: str,
         processing_time_ms: float,
     ) -> ExtractionResult:

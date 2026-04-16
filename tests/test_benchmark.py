@@ -5,7 +5,6 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -100,9 +99,8 @@ def test_compute_metrics_basic():
 def test_extract_baseline_raises_without_pypdf2(tmp_path):
     pdf = tmp_path / "x.pdf"
     pdf.write_bytes(b"%PDF-1.4")
-    with patch.dict("sys.modules", {"PyPDF2": None}):
-        with pytest.raises(ImportError):
-            extract_baseline(pdf)
+    with patch.dict("sys.modules", {"PyPDF2": None}), pytest.raises(ImportError):
+        extract_baseline(pdf)
 
 
 def test_extract_baseline_with_mock_pypdf2(tmp_path):

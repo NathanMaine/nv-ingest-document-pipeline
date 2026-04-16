@@ -1,0 +1,149 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 Nathan Maine
+# SPDX-License-Identifier: Apache-2.0
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nv-ingest-document-pipeline"
+version = "0.1.0"
+description = "GPU-accelerated PDF document extraction pipeline built on NVIDIA nv-ingest. Extracts text, tables, and charts; converts to chat-format JSONL training data."
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Nathan Maine" }]
+requires-python = ">=3.10"
+keywords = ["nv-ingest", "nvidia", "pdf", "document-extraction", "rag", "training-data", "fine-tuning"]
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Text Processing :: General",
+]
+dependencies = [
+    "PyPDF2>=3.0.0",
+]
+
+[project.optional-dependencies]
+gpu = [
+    "nv-ingest>=26.1.2",
+    "nv-ingest-api>=26.1.2",
+    "nv-ingest-client>=26.1.2",
+]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+    "mypy>=1.10.0",
+    "ruff>=0.6.0",
+    "pre-commit>=3.7.0",
+]
+
+[project.urls]
+Repository = "https://github.com/NathanMaine/nv-ingest-document-pipeline"
+Issues = "https://github.com/NathanMaine/nv-ingest-document-pipeline/issues"
+Documentation = "https://github.com/NathanMaine/nv-ingest-document-pipeline/tree/main/docs"
+
+[tool.setuptools.packages.find]
+include = ["src*"]
+
+# ---------------------------------------------------------------------------
+# pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra --strict-markers --strict-config"
+testpaths = ["tests"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "requires_gpu: marks tests that need a real GPU + nv-ingest container",
+]
+
+# ---------------------------------------------------------------------------
+# coverage
+# ---------------------------------------------------------------------------
+[tool.coverage.run]
+source = ["src"]
+branch = true
+omit = ["tests/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+show_missing = true
+skip_covered = false
+
+# ---------------------------------------------------------------------------
+# mypy --strict configuration
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+show_error_codes = true
+show_column_numbers = true
+pretty = true
+
+# nv_ingest_client is an optional dependency; tests use mocks
+[[tool.mypy.overrides]]
+module = ["nv_ingest_client.*", "PyPDF2", "PyPDF2.*"]
+ignore_missing_imports = true
+
+# Tests can be more relaxed
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_untyped_decorators = false
+
+# ---------------------------------------------------------------------------
+# ruff
+# ---------------------------------------------------------------------------
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+extend-exclude = [
+    ".venv",
+    "data",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "UP",     # pyupgrade
+    "SIM",    # flake8-simplify
+    "PL",     # pylint
+    "RUF",    # ruff-specific
+]
+ignore = [
+    "E501",     # line too long (we set line-length above; let formatter handle wrapping)
+    "PLR0913",  # too many arguments in function definition (some constructors are wide)
+    "PLR2004",  # magic value used in comparison (acceptable in tests)
+    "PLR0912",  # too many branches (acceptable in chunker)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["PLR2004", "B011", "S101", "SIM117", "PLC0415", "PLR0915"]      # asserts, magic values, nested withs OK in tests
+"examples/*" = ["PLR2004", "T201"]            # print statements OK in examples
+"src/extractor.py" = ["PLC0415"]              # nv_ingest_client imported lazily (optional dep)
+"src/benchmark.py" = ["PLC0415"]              # PyPDF2 imported lazily (optional dep)

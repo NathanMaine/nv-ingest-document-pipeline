@@ -24,6 +24,7 @@ import logging
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 from src.extractor import DocumentExtractor, ExtractedContent, ExtractionResult
 
@@ -146,8 +147,8 @@ def run_benchmark(
     """
     comparisons = []
 
-    for pdf_path in pdf_paths:
-        pdf_path = Path(pdf_path)
+    for raw_path in pdf_paths:
+        pdf_path = Path(raw_path)
         logger.info("Benchmarking: %s", pdf_path.name)
 
         # Baseline (PyPDF2)
@@ -206,9 +207,9 @@ def _write_results(
     """Write benchmark results to JSON."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    data = []
+    data: list[dict[str, Any]] = []
     for comp in comparisons:
-        entry = {"source_file": comp.source_file}
+        entry: dict[str, Any] = {"source_file": comp.source_file}
         if comp.baseline:
             entry["baseline"] = {
                 "method": comp.baseline.method,

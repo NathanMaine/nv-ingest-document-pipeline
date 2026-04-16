@@ -1,5 +1,12 @@
 # nv-ingest Document Pipeline
 
+[![CI](https://github.com/NathanMaine/nv-ingest-document-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/NathanMaine/nv-ingest-document-pipeline/actions/workflows/ci.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![Coverage 95%](https://img.shields.io/badge/coverage-95%25-brightgreen.svg)](#testing-and-quality)
+[![Type-checked: mypy strict](https://img.shields.io/badge/mypy-strict-blue.svg)](https://mypy.readthedocs.io/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+
 A GPU-accelerated document extraction pipeline built on [NVIDIA nv-ingest](https://github.com/NVIDIA/nv-ingest) (~2.8K stars). Extract text, tables, charts, and metadata from any PDF corpus and convert the output into chat-format JSONL training data for fine-tuning LLMs on your domain.
 
 This repo is a **starter / shell**. The architecture is generic. You bring the documents, you choose the system prompt, you decide what your domain-specific question framing looks like — the pipeline handles the heavy lifting of extraction, chunking, formatting, and benchmarking.

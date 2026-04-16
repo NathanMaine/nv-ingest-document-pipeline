@@ -27,6 +27,7 @@ import logging
 import re
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from src.extractor import ExtractedContent, ExtractionResult
 
@@ -55,7 +56,7 @@ class TrainingExample:
     assistant: str
     source: str
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "messages": [
                 {"role": "system", "content": self.system},

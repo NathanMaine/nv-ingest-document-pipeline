@@ -13,25 +13,19 @@ from __future__ import annotations
 
 import sys
 import types
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pytest
-
+from src.benchmark import (
+    BenchmarkComparison,
+    BenchmarkMetrics,
+    _write_results,
+    extract_baseline,
+    run_benchmark,
+)
 from src.converter import DocumentConverter
 from src.extractor import (
     DocumentExtractor,
-    ExtractedContent,
     ExtractionResult,
-)
-from src.benchmark import (
-    _compute_metrics,
-    _write_results,
-    BenchmarkComparison,
-    BenchmarkMetrics,
-    extract_baseline,
-    format_results_table,
-    run_benchmark,
 )
 
 
