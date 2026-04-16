@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 Nathan Maine
+# SPDX-License-Identifier: Apache-2.0
+#
+# Docker Compose for NVIDIA nv-ingest document extraction.
+#
+# Prerequisites:
+#   - NVIDIA GPU (RTX 3090+ recommended)
+#   - NVIDIA Container Toolkit installed
+#   - NGC account (free): docker login nvcr.io
+#
+# Usage:
+#   docker compose up -d          # Start nv-ingest service
+#   docker compose logs -f        # Watch startup (10-15 min first time)
+#   docker compose down           # Stop services
+#
+# First startup pulls ~20GB of container images and loads models.
+# Subsequent starts are much faster with cached models.
+#
+# Full setup walkthrough: docs/SETUP.md
+# Troubleshooting: docs/TROUBLESHOOTING.md
+
+services:
+  nv-ingest:
+    image: nvcr.io/nvidia/nemo-microservices/nv-ingest:26.1.2
+    ports:
+      - "127.0.0.1:7670:7670"
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    shm_size: "16g"
+    volumes:
+      - ./data/sample_pdfs:/workspace/docs:ro
+      - nv-ingest-cache:/root/.cache
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7670/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 600s  # 10 min grace for model loading
+
+  redis:
+    image: redis:7.4-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+
+volumes:
+  nv-ingest-cache:

@@ -1,0 +1,26 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+.env
+*.log
+venv/
+.venv/
+
+# Large PDFs (keep sample_pdfs small)
+data/full_pdfs/
+*.pdf
+!data/sample_pdfs/*.pdf
+
+# Benchmark outputs
+benchmarks/results/
+
+# nv-ingest local model cache (if mounted)
+nv-ingest-cache/
